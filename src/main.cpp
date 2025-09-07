@@ -12,7 +12,10 @@ void loop()
 {
   int distance = ultrsonicSensor.read();
 
-  Serial.print("Distance in CM: ");
-  Serial.println(distance);
+  if (distance < 5)
+  {
+    Serial.println("ALERT");
+  }
+
   delay(1000);
 }
