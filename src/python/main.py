@@ -16,10 +16,13 @@ def main():
                     distance = int(line)
                     if distance < 5:
                         print("RED ZONE!!! Danger")
+                        arduino.write(b'RED\n')
                     elif distance < 10:
                         print('YELLOW ZONE! Object Close')
+                        arduino.write(b'YELLOW\n')
                     else:
                         print(f"Safe distance: {distance} cm. GREEN ZONE")
+                        arduino.write(b'GREEN\n')
                 except ValueError:
                     print('Data received is not a INT')
         
