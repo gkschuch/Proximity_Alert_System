@@ -12,8 +12,16 @@ def main():
         while True:
             line = arduino.readline().decode('utf-8').strip()
             if line:
-                if line == 'ALERT':
-                    print("Object too close")
+                try:
+                    distance = int(line)
+                    if distance < 5:
+                        print("RED ZONE!!! Danger")
+                    elif distance < 10:
+                        print('YELLOW ZONE! Object Close')
+                    else:
+                        print(f"Safe distance: {distance} cm. GREEN ZONE")
+                except ValueError:
+                    print('Data received is not a INT')
         
             time.sleep(0.1)
     except serial.SerialException as e:

@@ -11,11 +11,6 @@ void setup()
 void loop()
 {
   int distance = ultrsonicSensor.read();
-
-  if (distance < 5)
-  {
-    Serial.println("ALERT");
-  }
-
-  delay(1000);
+  Serial.println(distance);
+  delay(200);
 }
