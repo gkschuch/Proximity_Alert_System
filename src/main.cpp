@@ -4,13 +4,45 @@
 
 Ultrasonic ultrasonicSensor(TRIGGER_PIN, ECHO_PIN);
 
-void checkSerialCommands();
-void sendDistance();
+/**
+ * @brief Measures the distance and sends the value over serial.
+ */
+void sendDistance()
+{
+  int distance = ultrasonicSensor.read();
+  Serial.println(distance);
+}
+
+/**
+ * @brief Sets the state of the LEDs based on a color command.
+ * Turns one LED on and the others off.
+ * @param colorCommand A character representing the color ('R', 'Y', or 'G').
+ */
+void setLedState(char colorCommand)
+{
+  // First, turn all LEDs off to ensure only one is active at a time.
+  digitalWrite(RED_LED_PIN, LOW);
+  digitalWrite(YELLOW_LED_PIN, LOW);
+  digitalWrite(GREEN_LED_PIN, LOW);
+
+  // Now, turn on the correct LED based on the command.
+  if (colorCommand == 'R')
+  {
+    digitalWrite(RED_LED_PIN, HIGH);
+  }
+  else if (colorCommand == 'Y')
+  {
+    digitalWrite(YELLOW_LED_PIN, HIGH);
+  }
+  else if (colorCommand == 'G')
+  {
+    digitalWrite(GREEN_LED_PIN, HIGH);
+  }
+}
 
 void setup()
 {
   Serial.begin(9600);
-
   pinMode(RED_LED_PIN, OUTPUT);
   pinMode(YELLOW_LED_PIN, OUTPUT);
   pinMode(GREEN_LED_PIN, OUTPUT);
@@ -18,56 +50,18 @@ void setup()
 
 void loop()
 {
-  checkSerialCommands();
-
-  sendDistance();
-  delay(50);
-}
-
-/**
- * @brief Checks for commands received via the serial port to control the LEDs.
- *
- * This function reads a line from the serial buffer, removes whitespace,
- * and compares the command to the strings "RED", "YELLOW", or "GREEN". It then
- * turns on the corresponding LED and turns off the other two.
- */
-void checkSerialCommands()
-{
+  // Wait for a command to arrive from Python.
   if (Serial.available() > 0)
   {
-    String command = Serial.readStringUntil('\n');
-    command.trim();
+    char command = Serial.read();
 
-    if (command == "RED")
+    if (command == 'D') // 'D' for Distance
     {
-      digitalWrite(GREEN_LED_PIN, LOW);
-      digitalWrite(RED_LED_PIN, HIGH);
-      digitalWrite(YELLOW_LED_PIN, LOW);
+      sendDistance();
     }
-    else if (command == "YELLOW")
+    else if (command == 'R' || command == 'Y' || command == 'G') // Color Commands
     {
-      digitalWrite(GREEN_LED_PIN, LOW);
-      digitalWrite(RED_LED_PIN, LOW);
-      digitalWrite(YELLOW_LED_PIN, HIGH);
-    }
-    else if (command == "GREEN")
-    {
-      digitalWrite(GREEN_LED_PIN, HIGH);
-      digitalWrite(RED_LED_PIN, LOW);
-      digitalWrite(YELLOW_LED_PIN, LOW);
+      setLedState(command);
     }
   }
-}
-
-/**
- * @brief Measures the distance with the sensor and sends it via the serial port.
- *
- * This function uses the `read()` method from the Ultrasonic library to get the
- * distance in centimeters and prints it to the serial port for Python to read.
- */
-void sendDistance()
-{
-  int distance = ultrasonicSensor.read();
-
-  Serial.println(distance);
 }
