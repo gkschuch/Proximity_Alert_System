@@ -4,37 +4,26 @@
 
 Ultrasonic ultrasonicSensor(TRIGGER_PIN, ECHO_PIN);
 
-/**
- * @brief Measures the distance and sends the value over serial.
- */
-void sendDistance()
+void sendDistance(int distance)
 {
-  int distance = ultrasonicSensor.read();
   Serial.println(distance);
 }
 
-/**
- * @brief Sets the state of the LEDs based on a color command.
- * Turns one LED on and the others off.
- * @param colorCommand A character representing the color ('R', 'Y', or 'G').
- */
-void setLedState(char colorCommand)
+void setLedState(int distance)
 {
-  // First, turn all LEDs off to ensure only one is active at a time.
   digitalWrite(RED_LED_PIN, LOW);
   digitalWrite(YELLOW_LED_PIN, LOW);
   digitalWrite(GREEN_LED_PIN, LOW);
 
-  // Now, turn on the correct LED based on the command.
-  if (colorCommand == 'R')
+  if (distance <= DANGER_THRESHOLD)
   {
     digitalWrite(RED_LED_PIN, HIGH);
   }
-  else if (colorCommand == 'Y')
+  else if (distance <= WARNING_THRESHOLD)
   {
     digitalWrite(YELLOW_LED_PIN, HIGH);
   }
-  else if (colorCommand == 'G')
+  else
   {
     digitalWrite(GREEN_LED_PIN, HIGH);
   }
@@ -43,25 +32,22 @@ void setLedState(char colorCommand)
 void setup()
 {
   Serial.begin(9600);
-  pinMode(RED_LED_PIN, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
   pinMode(YELLOW_LED_PIN, OUTPUT);
   pinMode(GREEN_LED_PIN, OUTPUT);
 }
 
 void loop()
 {
-  // Wait for a command to arrive from Python.
+  int distance = ultrasonicSensor.read();
   if (Serial.available() > 0)
   {
     char command = Serial.read();
 
-    if (command == 'D') // 'D' for Distance
+    if (command == 'D')
     {
-      sendDistance();
-    }
-    else if (command == 'R' || command == 'Y' || command == 'G') // Color Commands
-    {
-      setLedState(command);
+      sendDistance(distance);
     }
   }
+  setLedState(distance);
 }

@@ -1,10 +1,3 @@
-"""
-Main entry point for the Proximity Dashboard application.
-
-This script initializes the Qt application, creates the main window,
-and starts the event loop.
-"""
-
 import sys
 from PySide6.QtWidgets import QApplication
 from modules.main_window import MainWindow
